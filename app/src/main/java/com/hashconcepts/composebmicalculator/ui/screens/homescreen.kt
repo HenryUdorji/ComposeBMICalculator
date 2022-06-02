@@ -5,6 +5,7 @@ import android.widget.Toast
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -36,16 +37,26 @@ fun HomeScreen() {
             .background(DeepBlue)
             .fillMaxSize()
     ) {
-        Column {
-            ToolbarSection()
-            Spacer(modifier = Modifier.height(20.dp))
-            GenderSection()
-            Spacer(modifier = Modifier.height(25.dp))
-            HeightSection()
-            Spacer(modifier = Modifier.height(25.dp))
-            WeightAgeSection()
-            Spacer(modifier = Modifier.height(25.dp))
-            Button()
+        LazyColumn {
+            item {
+                ToolbarSection()
+                Spacer(modifier = Modifier.height(20.dp))
+            }
+            item {
+                GenderSection()
+                Spacer(modifier = Modifier.height(25.dp))
+            }
+            item {
+                HeightSection()
+                Spacer(modifier = Modifier.height(25.dp))
+            }
+            item {
+                WeightAgeSection()
+                Spacer(modifier = Modifier.height(25.dp))
+            }
+            item {
+                Button()
+            }
         }
     }
 }
@@ -56,9 +67,7 @@ fun ToolbarSection() {
         text = "BMI CALCULATOR",
         style = MaterialTheme.typography.h1,
         textAlign = TextAlign.Center,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(10.dp)
+        modifier = Modifier.fillMaxWidth()
     )
 }
 
@@ -152,7 +161,7 @@ fun RowScope.WeightAgeSectionItem(sectionType: String) {
         modifier = Modifier
             .clip(RoundedCornerShape(15.dp))
             .background(ButtonBlue)
-            .padding(vertical = 25.dp)
+            .padding(vertical = 20.dp)
             .fillMaxWidth()
             .weight(1f)
     ) {
@@ -183,7 +192,7 @@ fun RowScope.CounterItem(counterIcon: Int, onValueChange: () -> Unit) {
             painter = painterResource(id = counterIcon),
             contentDescription = "",
             tint = TextWhite,
-            modifier = Modifier.size(70.dp)
+            modifier = Modifier.size(60.dp)
         )
     }
 }
