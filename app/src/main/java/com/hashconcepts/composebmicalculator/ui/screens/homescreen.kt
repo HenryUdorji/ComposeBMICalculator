@@ -1,5 +1,6 @@
 package com.hashconcepts.composebmicalculator.ui.screens
 
+import android.widget.Toast
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -12,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -71,28 +73,42 @@ fun ToolbarSection() {
 
 @Composable
 fun GenderSection() {
+    var maleState by remember { mutableStateOf(true) }
+    var femaleState by remember { mutableStateOf(false) }
+
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceAround
     ) {
-        GenderSectionItem("Male", R.drawable.ic_male)
+        GenderSectionItem("Male", R.drawable.ic_male, maleState) {
+            maleState = true
+            femaleState = false
+        }
         Spacer(modifier = Modifier.width(20.dp))
-        GenderSectionItem("Female", R.drawable.ic_female)
+        GenderSectionItem("Female", R.drawable.ic_female, femaleState) {
+            femaleState = true
+            maleState = false
+        }
     }
 }
 
 @Composable
-fun RowScope.GenderSectionItem(gender: String, @DrawableRes iconId: Int) {
+fun RowScope.GenderSectionItem(
+    gender: String,
+    @DrawableRes iconId: Int,
+    state: Boolean,
+    onClick: () -> Unit
+) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
         modifier = Modifier
             .clip(RoundedCornerShape(15.dp))
-            .background(ButtonBlue)
+            .background(if (state) Color.Blue else ButtonBlue)
             .padding(horizontal = 40.dp, vertical = 25.dp)
             .fillMaxWidth()
             .weight(1f)
-            .clickable { }
+            .clickable(onClick = onClick)
 
     ) {
         Icon(
@@ -200,11 +216,12 @@ fun RowScope.WeightAgeSectionItem(
 
 @Composable
 fun RowScope.CounterItem(counterIcon: Int, onClick: () -> Unit) {
-    Box(modifier = Modifier
-        .clip(CircleShape)
-        .background(DeepBlue)
-        .size(50.dp)
-        .clickable(onClick = onClick)
+    Box(
+        modifier = Modifier
+            .clip(CircleShape)
+            .background(DeepBlue)
+            .size(50.dp)
+            .clickable(onClick = onClick)
     ) {
         Icon(
             painter = painterResource(id = counterIcon),
@@ -217,6 +234,7 @@ fun RowScope.CounterItem(counterIcon: Int, onClick: () -> Unit) {
 
 @Composable
 fun Button() {
+    val context = LocalContext.current
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
@@ -224,6 +242,9 @@ fun Button() {
             .background(ButtonBlue)
             .fillMaxWidth()
             .height(60.dp)
+            .clickable(onClick = {
+                Toast.makeText(context, "Testing", Toast.LENGTH_SHORT).show()
+            })
     ) {
         Text(text = "Calculate BMI", style = MaterialTheme.typography.h2, color = TextWhite)
     }
