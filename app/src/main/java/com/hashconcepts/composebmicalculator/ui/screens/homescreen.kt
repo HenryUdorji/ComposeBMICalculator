@@ -23,6 +23,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.hashconcepts.composebmicalculator.R
+import com.hashconcepts.composebmicalculator.ui.Util
 import com.hashconcepts.composebmicalculator.ui.theme.*
 
 /**
@@ -32,6 +33,9 @@ import com.hashconcepts.composebmicalculator.ui.theme.*
  */
 @Composable
 fun HomeScreen() {
+    val heightState = remember { mutableStateOf(1) }
+    val weightState = remember { mutableStateOf(1) }
+    val ageState = remember { mutableStateOf(1) }
     Box(
         modifier = Modifier
             .background(DeepBlue)
@@ -46,16 +50,17 @@ fun HomeScreen() {
                 GenderSection()
                 Spacer(modifier = Modifier.height(25.dp))
             }
+
             item {
-                HeightSection()
+                HeightSection(heightState)
                 Spacer(modifier = Modifier.height(25.dp))
             }
             item {
-                WeightAgeSection()
+                WeightAgeSection(weightState, ageState)
                 Spacer(modifier = Modifier.height(25.dp))
             }
             item {
-                Button()
+                Button(heightState, weightState, ageState)
             }
         }
     }
@@ -126,12 +131,11 @@ fun RowScope.GenderSectionItem(
 }
 
 @Composable
-fun HeightSection() {
-    var heightState by remember { mutableStateOf(1f) }
+fun HeightSection(heightState: MutableState<Int>) {
     val height = buildAnnotatedString {
         withStyle(
             style = SpanStyle(fontSize = 35.sp, fontFamily = gothicA1)
-        ) { append(heightState.toInt().toString()) }
+        ) { append(heightState.value.toString()) }
         append(" cm")
     }
     Column(
@@ -149,8 +153,8 @@ fun HeightSection() {
             style = MaterialTheme.typography.h1,
         )
         Slider(
-            value = heightState,
-            onValueChange = { heightState = it },
+            value = heightState.value.toFloat(),
+            onValueChange = { heightState.value = it.toInt() },
             valueRange = 1f..300f,
             steps = 0,
             modifier = Modifier.padding(10.dp),
@@ -163,23 +167,26 @@ fun HeightSection() {
 }
 
 @Composable
-fun WeightAgeSection() {
+fun WeightAgeSection(
+    weightState: MutableState<Int>,
+    ageState: MutableState<Int>
+) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceAround
     ) {
-        WeightAgeSectionItem("Weight")
+        WeightAgeSectionItem("Weight", weightState)
         Spacer(modifier = Modifier.width(20.dp))
-        WeightAgeSectionItem("Age")
+        WeightAgeSectionItem("Age", ageState)
     }
 }
 
 @Composable
 fun RowScope.WeightAgeSectionItem(
     sectionType: String,
+    numberPickerState: MutableState<Int>,
     range: IntRange = 1..100
 ) {
-    var numberPickerState by remember { mutableStateOf(1) }
 
     Column(
         verticalArrangement = Arrangement.Center,
@@ -191,8 +198,16 @@ fun RowScope.WeightAgeSectionItem(
             .fillMaxWidth()
             .weight(1f)
     ) {
-        Text(text = sectionType, fontSize = 25.sp, style = MaterialTheme.typography.h2)
-        Text(text = "$numberPickerState", fontSize = 35.sp, style = MaterialTheme.typography.h1)
+        Text(
+            text = sectionType,
+            fontSize = 25.sp,
+            style = MaterialTheme.typography.h2
+        )
+        Text(
+            text = "${numberPickerState.value}",
+            fontSize = 35.sp,
+            style = MaterialTheme.typography.h1
+        )
         Row(
             horizontalArrangement = Arrangement.Center,
             modifier = Modifier
@@ -200,14 +215,14 @@ fun RowScope.WeightAgeSectionItem(
                 .padding(10.dp)
         ) {
             CounterItem(counterIcon = R.drawable.ic_add) {
-                if (numberPickerState < range.last) {
-                    numberPickerState += 1
+                if (numberPickerState.value < range.last) {
+                    numberPickerState.value += 1
                 }
             }
             Spacer(modifier = Modifier.width(10.dp))
             CounterItem(counterIcon = R.drawable.ic_minus) {
-                if (numberPickerState > range.first) {
-                    numberPickerState -= 1
+                if (numberPickerState.value > range.first) {
+                    numberPickerState.value -= 1
                 }
             }
         }
@@ -233,7 +248,11 @@ fun RowScope.CounterItem(counterIcon: Int, onClick: () -> Unit) {
 }
 
 @Composable
-fun Button() {
+fun Button(
+    heightState: MutableState<Int>,
+    weightState: MutableState<Int>,
+    ageState: MutableState<Int>
+) {
     val context = LocalContext.current
     Box(
         contentAlignment = Alignment.Center,
@@ -243,10 +262,18 @@ fun Button() {
             .fillMaxWidth()
             .height(60.dp)
             .clickable(onClick = {
-                Toast.makeText(context, "Testing", Toast.LENGTH_SHORT).show()
+                val bmiResult = Util.calculateBMI(weightState.value, heightState.value)
+                //Todo -> Navigate to new screen
+                Toast
+                    .makeText(context, "${bmiResult.bmi}", Toast.LENGTH_SHORT)
+                    .show()
             })
     ) {
-        Text(text = "Calculate BMI", style = MaterialTheme.typography.h2, color = TextWhite)
+        Text(
+            text = "Calculate BMI",
+            style = MaterialTheme.typography.h2,
+            color = TextWhite
+        )
     }
 }
 
