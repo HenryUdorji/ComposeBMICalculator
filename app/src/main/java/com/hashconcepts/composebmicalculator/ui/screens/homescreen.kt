@@ -1,7 +1,5 @@
 package com.hashconcepts.composebmicalculator.ui.screens
 
-import android.widget.Button
-import android.widget.Toast
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -10,20 +8,20 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.hashconcepts.composebmicalculator.R
-import com.hashconcepts.composebmicalculator.ui.theme.ButtonBlue
-import com.hashconcepts.composebmicalculator.ui.theme.ComposeBMICalculatorTheme
-import com.hashconcepts.composebmicalculator.ui.theme.DeepBlue
-import com.hashconcepts.composebmicalculator.ui.theme.TextWhite
+import com.hashconcepts.composebmicalculator.ui.theme.*
 
 /**
  * @created 31/05/2022 - 11:13 AM
@@ -78,7 +76,7 @@ fun GenderSection() {
         horizontalArrangement = Arrangement.SpaceAround
     ) {
         GenderSectionItem("Male", R.drawable.ic_male)
-        Spacer(modifier = Modifier.width(10.dp))
+        Spacer(modifier = Modifier.width(20.dp))
         GenderSectionItem("Female", R.drawable.ic_female)
     }
 }
@@ -100,7 +98,7 @@ fun RowScope.GenderSectionItem(gender: String, @DrawableRes iconId: Int) {
         Icon(
             painter = painterResource(id = iconId),
             contentDescription = "",
-            tint = TextWhite,
+            tint = Color.Unspecified,
             modifier = Modifier.size(70.dp)
         )
         Spacer(modifier = Modifier.height(10.dp))
@@ -113,7 +111,13 @@ fun RowScope.GenderSectionItem(gender: String, @DrawableRes iconId: Int) {
 
 @Composable
 fun HeightSection() {
-    var sliderPosition by remember { mutableStateOf(1f) }
+    var heightState by remember { mutableStateOf(1f) }
+    val height = buildAnnotatedString {
+        withStyle(
+            style = SpanStyle(fontSize = 35.sp, fontFamily = gothicA1)
+        ) { append(heightState.toInt().toString()) }
+        append(" cm")
+    }
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -124,16 +128,20 @@ fun HeightSection() {
     ) {
         Text(text = "Height", fontSize = 25.sp, style = MaterialTheme.typography.h2)
         Text(
-            text = "${sliderPosition.toInt()}" + "cm",
+            text = "$height",
             fontSize = 35.sp,
             style = MaterialTheme.typography.h1,
         )
         Slider(
-            value = sliderPosition,
-            onValueChange = { sliderPosition = it },
+            value = heightState,
+            onValueChange = { heightState = it },
             valueRange = 1f..300f,
             steps = 0,
-            modifier = Modifier.padding(10.dp)
+            modifier = Modifier.padding(10.dp),
+            colors = SliderDefaults.colors(
+                activeTickColor = DeepBlue,
+                thumbColor = DeepBlue
+            )
         )
     }
 }
@@ -151,10 +159,12 @@ fun WeightAgeSection() {
 }
 
 @Composable
-fun RowScope.WeightAgeSectionItem(sectionType: String) {
-    var weightAgeValue by rememberSaveable {
-        mutableStateOf(1)
-    }
+fun RowScope.WeightAgeSectionItem(
+    sectionType: String,
+    range: IntRange = 1..100
+) {
+    var numberPickerState by remember { mutableStateOf(1) }
+
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -166,33 +176,41 @@ fun RowScope.WeightAgeSectionItem(sectionType: String) {
             .weight(1f)
     ) {
         Text(text = sectionType, fontSize = 25.sp, style = MaterialTheme.typography.h2)
-        Text(text = "$weightAgeValue", fontSize = 35.sp, style = MaterialTheme.typography.h1)
+        Text(text = "$numberPickerState", fontSize = 35.sp, style = MaterialTheme.typography.h1)
         Row(
             horizontalArrangement = Arrangement.Center,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(10.dp)
         ) {
-            CounterItem(counterIcon = R.drawable.ic_add) { weightAgeValue += 1 }
+            CounterItem(counterIcon = R.drawable.ic_add) {
+                if (numberPickerState < range.last) {
+                    numberPickerState += 1
+                }
+            }
             Spacer(modifier = Modifier.width(10.dp))
-            CounterItem(counterIcon = R.drawable.ic_minus) { weightAgeValue -= 1 }
+            CounterItem(counterIcon = R.drawable.ic_minus) {
+                if (numberPickerState > range.first) {
+                    numberPickerState -= 1
+                }
+            }
         }
     }
 }
 
 @Composable
-fun RowScope.CounterItem(counterIcon: Int, onValueChange: () -> Unit) {
+fun RowScope.CounterItem(counterIcon: Int, onClick: () -> Unit) {
     Box(modifier = Modifier
         .clip(CircleShape)
         .background(DeepBlue)
-        .size(60.dp)
-        .clickable { onValueChange }
+        .size(50.dp)
+        .clickable(onClick = onClick)
     ) {
         Icon(
             painter = painterResource(id = counterIcon),
             contentDescription = "",
             tint = TextWhite,
-            modifier = Modifier.size(60.dp)
+            modifier = Modifier.size(50.dp)
         )
     }
 }
