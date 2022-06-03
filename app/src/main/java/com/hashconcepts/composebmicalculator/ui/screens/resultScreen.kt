@@ -80,12 +80,14 @@ fun ColumnScope.ResultSection(
             text = weightRange,
             style = MaterialTheme.typography.h1,
             color = Teal200,
-            fontSize = 30.sp
+            fontSize = 30.sp,
+            modifier = Modifier.padding(horizontal = 20.dp)
         )
         Text(
             text = bmi, fontFamily = gothicA1,
             fontSize = 60.sp,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(horizontal = 20.dp)
         )
         Text(
             text = message,
