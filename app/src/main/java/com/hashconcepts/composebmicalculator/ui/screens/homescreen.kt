@@ -22,8 +22,11 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.hashconcepts.composebmicalculator.R
 import com.hashconcepts.composebmicalculator.ui.Util
+import com.hashconcepts.composebmicalculator.ui.components.ToolbarSection
 import com.hashconcepts.composebmicalculator.ui.theme.*
 
 /**
@@ -32,7 +35,7 @@ import com.hashconcepts.composebmicalculator.ui.theme.*
  * @author  ifechukwu.udorji
  */
 @Composable
-fun HomeScreen() {
+fun HomeScreen(navController: NavController) {
     val heightState = remember { mutableStateOf(1) }
     val weightState = remember { mutableStateOf(1) }
     val ageState = remember { mutableStateOf(1) }
@@ -41,9 +44,11 @@ fun HomeScreen() {
             .background(DeepBlue)
             .fillMaxSize()
     ) {
-        LazyColumn {
+        LazyColumn(
+            contentPadding = PaddingValues(horizontal = 5.dp),
+        ) {
             item {
-                ToolbarSection()
+                ToolbarSection(onBackArrowClicked = {})
                 Spacer(modifier = Modifier.height(20.dp))
             }
             item {
@@ -60,20 +65,10 @@ fun HomeScreen() {
                 Spacer(modifier = Modifier.height(25.dp))
             }
             item {
-                Button(heightState, weightState, ageState)
+                Button(heightState, weightState, ageState, navController)
             }
         }
     }
-}
-
-@Composable
-fun ToolbarSection() {
-    Text(
-        text = "BMI CALCULATOR",
-        style = MaterialTheme.typography.h1,
-        textAlign = TextAlign.Center,
-        modifier = Modifier.fillMaxWidth()
-    )
 }
 
 @Composable
@@ -251,9 +246,9 @@ fun RowScope.CounterItem(counterIcon: Int, onClick: () -> Unit) {
 fun Button(
     heightState: MutableState<Int>,
     weightState: MutableState<Int>,
-    ageState: MutableState<Int>
+    ageState: MutableState<Int>,
+    navController: NavController
 ) {
-    val context = LocalContext.current
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
@@ -263,10 +258,11 @@ fun Button(
             .height(60.dp)
             .clickable(onClick = {
                 val bmiResult = Util.calculateBMI(weightState.value, heightState.value)
-                //Todo -> Navigate to new screen
-                Toast
-                    .makeText(context, "${bmiResult.bmi}", Toast.LENGTH_SHORT)
-                    .show()
+                navController.navigate(Screens.ResultScreen.withArgs(
+                    bmiResult.bmi.toString(),
+                    bmiResult.weightRange,
+                    bmiResult.message
+                ))
             })
     ) {
         Text(
@@ -282,6 +278,6 @@ fun Button(
 @Composable
 fun DefaultPreview() {
     ComposeBMICalculatorTheme {
-        HomeScreen()
+        HomeScreen(rememberNavController())
     }
 }

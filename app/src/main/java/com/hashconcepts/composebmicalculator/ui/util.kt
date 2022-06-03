@@ -13,7 +13,7 @@ object Util {
 
     fun calculateBMI(weight: Int, height: Int): BmiResult {
         //convert height to meters then square it
-        val convertedHeight = ((height.toDouble() / 100).pow(2.0)).roundOff()
+        val convertedHeight = ((height.toDouble() / 100.0).pow(2.0)).roundOff()
         val bmi = weight.toDouble() / convertedHeight
 
         val message = processMessage(bmi)
@@ -51,3 +51,7 @@ data class BmiResult(
     val weightRange: String,
     val message: String,
 )
+
+const val ARGS_BMI = "bmi"
+const val ARGS_WEIGHT_RANGE = "weightRange"
+const val ARGS_MESSAGE = "message"

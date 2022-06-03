@@ -11,6 +11,8 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.rememberNavController
+import com.hashconcepts.composebmicalculator.ui.components.Navigation
 import com.hashconcepts.composebmicalculator.ui.screens.HomeScreen
 import com.hashconcepts.composebmicalculator.ui.theme.ComposeBMICalculatorTheme
 
@@ -19,7 +21,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             ComposeBMICalculatorTheme {
-              HomeScreen()
+              Navigation()
             }
         }
     }
